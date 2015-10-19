@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--suppress JSUnresolvedLibraryURL -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Погода</title>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link href="css/bootstrap-theme.css" rel="stylesheet">
+    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <script type="text/javascript">
+
+        var selected="";
+
+        function getWeather(id) {           //получить данные с сервера для выбранного города
+          selected=id;
+          var request = new XMLHttpRequest();
+          request.open ("GET", 'http://localhost/id/'+id);
+          request.onreadystatechange = function () {
+              if (request.readyState===4 && request.status===200) {
+                  var result=JSON.parse(request.responseText);
+                  result = result[0];
+
+                  document.getElementById("wind").textContent="Ветер: "+result.wind+" м/с";
+                  document.getElementById("tmprtr").textContent=(result.temperature>0?"+":"")+result.temperature+" C";
+                  document.getElementById("wthr_type").textContent=result.weather_type;
+                  document.getElementById("pressure").textContent="Давление: "+result.pressure+" мм.рт.ст.";
+                  document.getElementById("hmdty").textContent="Влажность: "+result.humidity+" %";
+                  document.getElementById("pctr").src="icons/"+result.picture+".png";
+              }
+          };
+          request.send(null);
+        }
+
+        setInterval(function () {                   //каждые 5 минут обновлять информацию
+                        if (selected=="") return;
+                        getWeather(selected);},
+                        300000);
+    </script>
+</head>
+<body>
+    <div class="btn-group" role="group" >
+        <button type="button" class="btn btn-default" onclick="getWeather(27612)">Москва</button>
+        <button type="button" class="btn btn-default" onclick="getWeather(27459)">Н.Новгород</button>
+        <button type="button" class="btn btn-default" onclick="getWeather(26063)">С.Перербург</button>
+    </div>
+    <div>Погода</div>
+    <div>
+        <div style="position: relative; height: 48px;"><img src="" id="pctr"></div>
+        <div style="position: relative; top: -48px; left:48px;">
+            <div id="tmprtr">Выберите город</div>
+            <div id="wthr_type"></div>
+            <div id="wind"></div>
+            <div id="pressure"></div>
+            <div id="hmdty"></div>
+        </div>
+    </div>
+</body>
+
+</html>
